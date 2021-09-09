@@ -1,8 +1,10 @@
+import com.sun.istack.internal.NotNull;
+
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 
 public class Hasta {
-    String ad;
-    String soyad;
+    String adSoyad;
     String telefon;
     String adres;
     String dogumTarihi;
@@ -10,6 +12,30 @@ public class Hasta {
     BufferedImage profilResmi;
     String cinsiyet;
     String medeniHal;
+    String tc;
+    int yas;
+
+    public String getTc() {
+        return tc;
+    }
+
+    public void setTc(@org.jetbrains.annotations.NotNull String tc) {
+        if (tc.length() > 11)
+            JOptionPane.showMessageDialog(null, "TC kimlik numarası 11 haneden fazla olamaz.", "TC No Hatası", JOptionPane.INFORMATION_MESSAGE);
+        else
+            this.tc = tc;
+    }
+
+    public int getYas() {
+        return yas;
+    }
+
+    public void setYas(int yas) {
+        if (yas >= 0 && yas <= 150)
+            this.yas = yas;
+        else
+            JOptionPane.showMessageDialog(null, "Yaş bilgisi 0 ile 150 arasında olmalıdır.", "Yaş Hatası", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     public String getCinsiyet() {
         return cinsiyet;
@@ -19,20 +45,12 @@ public class Hasta {
         this.cinsiyet = cinsiyet;
     }
 
-    public String getAd() {
-        return ad;
+    public String getAdSoyad() {
+        return adSoyad;
     }
 
-    public void setAd(String ad) {
-        this.ad = ad;
-    }
-
-    public String getSoyad() {
-        return soyad;
-    }
-
-    public void setSoyad(String soyad) {
-        this.soyad = soyad;
+    public void setAdSoyad(String adSoyad) {
+        this.adSoyad = adSoyad;
     }
 
     public String getTelefon() {
@@ -40,7 +58,10 @@ public class Hasta {
     }
 
     public void setTelefon(String telefon) {
-        this.telefon = telefon;
+        if (telefon.length() > 11)
+            this.telefon = telefon;
+        else
+            JOptionPane.showMessageDialog(null, "Telefon bilgisi en fazla 11 hane olmalıdır.", "Telefon Hatası", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public String getAdres() {
@@ -48,7 +69,10 @@ public class Hasta {
     }
 
     public void setAdres(String adres) {
-        this.adres = adres;
+        if (adres == "")
+            this.adres = adres;
+        else
+            adres = "TANIMSIZ";
     }
 
     public String getDogumTarihi() {
