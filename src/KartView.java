@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.lang.reflect.Field;
 
 public class KartView extends JFrame implements ActionListener, MouseListener {
 
@@ -108,8 +107,8 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
         //sayac = new Timer(400, this);
 
         String[][] veri = {
-                {"12345678911", "Deneme", "5558833554", "deneme adresi", "05.08.1994", "B+", "Erkek", "Evli", "path/image.png"},
-                {"21312213213", "Deneme2", "5558833555", "deneme adresi2", "05.08.1990", "A+", "Kadın", "Bekar", "path/image.jpg"}
+                {"12345678911", "Deneme", "5558833554", "deneme adresi", "05.08.1994", "B+", "Erkek", "Evli", "../kaynaklar/resimler/pp_placeholder.png"},
+                {"21312213213", "Deneme2", "5558833555", "deneme adresi2", "05.08.1990", "A+", "Kadın", "Bekar", "./kaynaklar/resimler/pp_placeholder.png"}
         };
 
         String[] sutun = {"TC Kimlik No", "Ad Soyad", "Telefon", "Adres", "Doğum Tarihi", "Kan Grubu", "Cinsiyet", "Medeni Hali", "Profil Fotoğrafı"};
@@ -191,7 +190,6 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String tc, adSoyad, telefon, adres, kan, cinsiyet, medeni, dogumTar, imgAdres = "";
-        imgAdres =
 
         tc = txtTC.getText();
         adSoyad = txtAdSoyad.getText();
@@ -202,22 +200,7 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
         medeni = txtMedeni.getText();
         dogumTar = txtDogumTarihi.getText();
 
-
         if (e.getSource() == btnKaydet) {
-            Field field = null;
-            try {
-                field = imgProfilResmi.getClass().getField("filename");
-            } catch (NoSuchFieldException ex) {
-                ex.printStackTrace();
-            }
-            field.setAccessible(true);
-
-            try {
-                imgAdres = (String) field.get(imgProfilResmi);
-            } catch (IllegalAccessException ex) {
-                ex.printStackTrace();
-            }
-
             if (txtTC.getText().equals("")) txtTC.requestFocus();
 
             for (int i = 0; i < tableModel.getRowCount(); i++) {
@@ -230,12 +213,11 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
 
         if (e.getSource() == btnSil) {
             int[] satirlar = table.getSelectedRows();
+            if (!(satirlar.length > 0))
+                return;
 
             for (int i = 0; i < satirlar.length; i++) {
-                if (satirlar[i] > 0)
-                    tableModel.removeRow(satirlar[i] - i);
-                else
-                    return;
+                tableModel.removeRow(satirlar[i] - i);
             }
         }
 
@@ -268,6 +250,7 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() == table) {
             int[] satirlar = table.getSelectedRows();
+            String imgPath = "";
 
             for (int i = 0; i < satirlar.length; i++) {
                 txtTC.setText(tableModel.getValueAt(satirlar[i], 0).toString());
@@ -278,7 +261,10 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
                 txtKan.setText(tableModel.getValueAt(satirlar[i], 5).toString());
                 txtCinsiyet.setText(tableModel.getValueAt(satirlar[i], 6).toString());
                 txtMedeni.setText(tableModel.getValueAt(satirlar[i], 7).toString());
+                imgPath = tableModel.getValueAt(satirlar[i], 8).toString();
             }
+            imgProfilResmi = new ImageIcon(new ImageIcon(imgPath).getImage().getScaledInstance(181, 147, Image.SCALE_DEFAULT));
+            lblResimCerceve.setIcon(imgProfilResmi);
         }
     }
 
