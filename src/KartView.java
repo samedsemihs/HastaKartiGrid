@@ -9,22 +9,22 @@ import java.io.File;
 
 public class KartView extends JFrame implements ActionListener, MouseListener {
 
-    JPanel ustPanel, altPanel;
-    JSplitPane divPanel;
-    JScrollPane jScrollPane;
-    JTable table;
-    DefaultTableModel tableModel;
+    private JPanel ustPanel, altPanel;
+    private JSplitPane divPanel;
+    private JScrollPane jScrollPane;
+    private JTable table;
+    private DefaultTableModel tableModel;
     ImageIcon imgProfilResmi = new ImageIcon(new ImageIcon("./kaynaklar/resimler/pp_placeholder.png").getImage().getScaledInstance(181, 147, Image.SCALE_DEFAULT));
-    JTextField txtTC, txtAdSoyad;
-    JTextField txtTelefon, txtAdres;
-    JTextField txtMedeni, txtKan;
-    JTextField txtCinsiyet, txtDogumTarihi;
-    JLabel lblTC, lblAdSoyad;
-    JLabel lblTelefon, lblAdres;
-    JLabel lblMedeni, lblKan, lblResimCerceve;
-    JLabel lblCinsiyet, lblDogumTarihi;
-    JButton btnKaydet, btnSil, btnTemizle, btnFotoSec;
-    Dimension boyut = Toolkit.getDefaultToolkit().getScreenSize();
+    private JTextField txtTC, txtAdSoyad;
+    private JTextField txtTelefon, txtAdres;
+    private JTextField txtMedeni, txtKan;
+    private JTextField txtCinsiyet, txtDogumTarihi;
+    private JLabel lblTC, lblAdSoyad;
+    private JLabel lblTelefon, lblAdres;
+    private JLabel lblMedeni, lblKan, lblResimCerceve;
+    private JLabel lblCinsiyet, lblDogumTarihi;
+    private JButton btnKaydet, btnSil, btnTemizle, btnFotoSec;
+    private Dimension boyut = Toolkit.getDefaultToolkit().getScreenSize();
     //Timer sayac;
     private final int genislik = 910;
     private final int yukseklik = 700;
@@ -189,7 +189,7 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String tc, adSoyad, telefon, adres, kan, cinsiyet, medeni, dogumTar, imgAdres = "";
+        String tc, adSoyad, telefon, adres, kan, cinsiyet, medeni, dogumTar;
 
         tc = txtTC.getText();
         adSoyad = txtAdSoyad.getText();
@@ -200,6 +200,20 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
         medeni = txtMedeni.getText();
         dogumTar = txtDogumTarihi.getText();
 
+        FileDialog fd;
+        String imgYol = "";
+
+        if (e.getSource() == btnFotoSec) {
+            fd = new FileDialog(new JFrame());
+            fd.setVisible(true);
+            File[] f = fd.getFiles();
+            imgYol = fd.getFiles()[0].getAbsolutePath();
+            if (f.length > 0) {
+                imgProfilResmi = new ImageIcon(new ImageIcon(imgYol).getImage().getScaledInstance(181, 147, Image.SCALE_DEFAULT));
+                lblResimCerceve.setIcon(imgProfilResmi);
+            }
+        }
+
         if (e.getSource() == btnKaydet) {
             if (txtTC.getText().equals("")) txtTC.requestFocus();
 
@@ -208,7 +222,7 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
                     return;
                 }
             }
-            tableModel.insertRow(table.getRowCount(), new Object[]{tc, adSoyad, telefon, adres, dogumTar, kan, cinsiyet, dogumTar, imgAdres});
+            tableModel.insertRow(table.getRowCount(), new Object[]{tc, adSoyad, telefon, adres, dogumTar, kan, cinsiyet, medeni, imgYol});
         }
 
         if (e.getSource() == btnSil) {
@@ -232,17 +246,6 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
             txtAdSoyad.setText("");
             imgProfilResmi = new ImageIcon(new ImageIcon("./kaynaklar/resimler/pp_placeholder.png").getImage().getScaledInstance(181, 147, Image.SCALE_DEFAULT));
             lblResimCerceve.setIcon(imgProfilResmi);
-        }
-
-        if (e.getSource() == btnFotoSec) {
-            FileDialog fd = new FileDialog(new JFrame());
-            fd.setVisible(true);
-            File[] f = fd.getFiles();
-            String imgYol = fd.getFiles()[0].getAbsolutePath();
-            if (f.length > 0) {
-                imgProfilResmi = new ImageIcon(new ImageIcon(imgYol).getImage().getScaledInstance(181, 147, Image.SCALE_DEFAULT));
-                lblResimCerceve.setIcon(imgProfilResmi);
-            }
         }
     }
 
