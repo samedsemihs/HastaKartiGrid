@@ -1,3 +1,5 @@
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -5,14 +7,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
+import java.awt.image.BufferedImage;
+import java.io.*;
 
 public class KartView extends JFrame implements ActionListener, MouseListener {
 
     private JPanel ustPanel, altPanel;
     private JSplitPane divPanel;
+    byte[] imgByteDizi = new byte[0];
     private JScrollPane jScrollPane;
     private JTable table;
+    private BufferedImage bfImg;
     private DefaultTableModel tableModel;
     ImageIcon imgProfilResmi = new ImageIcon(new ImageIcon("./kaynaklar/resimler/pp_placeholder.png").getImage().getScaledInstance(181, 147, Image.SCALE_DEFAULT));
     private JTextField txtTC, txtAdSoyad;
@@ -214,20 +219,43 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
             }
         }
 
+        if (!(lblResimCerceve.getIcon().getIconHeight() <= 0)) {
+            bfImg = new BufferedImage(imgProfilResmi.getIconWidth(), imgProfilResmi.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = bfImg.createGraphics();
+            imgProfilResmi.paintIcon(null, g2d, 0, 0);
+            g2d.dispose();
+
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
+                try {
+                    ImageIO.write(bfImg, "png", ios);
+                } finally {
+                    ios.close();
+                }
+                imgByteDizi = baos.toByteArray();
+                System.out.println(imgByteDizi);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        }
+
         if (e.getSource() == btnKaydet) {
+
             if (txtTC.getText().equals("")) txtTC.requestFocus();
+            if (txtTC.getText().length() > 11) return;
+
 
             for (int i = 0; i < tableModel.getRowCount(); i++) {
                 if (tableModel.getValueAt(i, 0).toString().equals(txtTC.getText())) {
                     return;
                 }
             }
-            tableModel.insertRow(table.getRowCount(), new Object[]{tc, adSoyad, telefon, adres, dogumTar, kan, cinsiyet, medeni, imgYol});
+            tableModel.insertRow(table.getRowCount(), new Object[]{tc, adSoyad, telefon, adres, dogumTar, kan, cinsiyet, medeni, imgByteDizi});
         }
 
         if (e.getSource() == btnSil) {
             int[] satirlar = table.getSelectedRows();
-            if (!(satirlar.length > 0))
+            if (satirlar.length < 0)
                 return;
 
             for (int i = 0; i < satirlar.length; i++) {
@@ -253,7 +281,6 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() == table) {
             int[] satirlar = table.getSelectedRows();
-            String imgPath = "";
 
             for (int i = 0; i < satirlar.length; i++) {
                 txtTC.setText(tableModel.getValueAt(satirlar[i], 0).toString());
@@ -264,10 +291,18 @@ public class KartView extends JFrame implements ActionListener, MouseListener {
                 txtKan.setText(tableModel.getValueAt(satirlar[i], 5).toString());
                 txtCinsiyet.setText(tableModel.getValueAt(satirlar[i], 6).toString());
                 txtMedeni.setText(tableModel.getValueAt(satirlar[i], 7).toString());
-                imgPath = tableModel.getValueAt(satirlar[i], 8).toString();
+                imgByteDizi = (byte[]) tableModel.getValueAt(satirlar[i], 8);
             }
-            imgProfilResmi = new ImageIcon(new ImageIcon(imgPath).getImage().getScaledInstance(181, 147, Image.SCALE_DEFAULT));
+
+            try {
+                bfImg = ImageIO.read(new ByteArrayInputStream(imgByteDizi));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            imgProfilResmi.setImage(bfImg);
             lblResimCerceve.setIcon(imgProfilResmi);
+
         }
     }
 
